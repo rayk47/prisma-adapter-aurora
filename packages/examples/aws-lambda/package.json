@@ -1,0 +1,14 @@
+{
+  "name": "examples/aws-lambda",
+  "version": "0.0.1",
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "bin": {
+    "aws-lambda": "bin/main.js"
+  },
+  "type": "commonjs",
+  "main": "./src/lib/index.js",
+  "typings": "./src/lib/index.d.ts",
+  "private": true
+}

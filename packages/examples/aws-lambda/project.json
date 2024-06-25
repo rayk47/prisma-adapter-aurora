@@ -1,0 +1,103 @@
+{
+  "name": "examples-aws-lambda",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/examples/aws-lambda/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/packages/examples/aws-lambda",
+        "main": "packages/examples/aws-lambda/src/index.ts",
+        "tsConfig": "packages/examples/aws-lambda/tsconfig.lib.json",
+        "assets": [
+          "packages/examples/aws-lambda/*.md"
+        ]
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/examples/aws-lambda",
+        "commands": [
+          {
+            "command": "npx aws-cdk deploy --all --require-approval never",
+            "forwardAllArgs": true
+          }
+        ],
+        "parallel": false
+      },
+      "dependsOn": [
+        {
+          "target": "build",
+          "dependencies": true
+        }
+      ]
+    },
+    "deploy-lambdas": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/examples/aws-lambda",
+        "commands": [
+          {
+            "command": "npx aws-cdk deploy PrismaDataAPIlambdas --force",
+            "forwardAllArgs": true
+          }
+        ],
+        "parallel": false
+      },
+      "dependsOn": [
+        {
+          "target": "build",
+          "dependencies": true
+        }
+      ]
+    },
+    "destroy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/examples/aws-lambda",
+        "commands": [
+          {
+            "command": "npx aws-cdk destroy prisma-rds-data-api* --force",
+            "forwardAllArgs": true
+          }
+        ],
+        "parallel": false
+      },
+      "dependsOn": [
+        {
+          "target": "build",
+          "dependencies": true
+        }
+      ]
+    },
+    "bootstrap": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/examples/aws-lambda",
+        "commands": [
+          {
+            "command": "source ./source.sh",
+            "forwardAllArgs": false
+          },
+          {
+            "command": "npx aws-cdk bootstrap",
+            "forwardAllArgs": true
+          }
+        ],
+        "parallel": false
+      },
+      "dependsOn": [
+        {
+          "target": "build",
+          "dependencies": true
+        }
+      ]
+    }
+  }
+}
