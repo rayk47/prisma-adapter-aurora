@@ -4,8 +4,6 @@ import * as cdk from 'aws-cdk-lib';
 import { config } from 'dotenv';
 import { Aurora } from '../src/lib/aurora-stack';
 import { Lambdas } from '../src/lib/lambdas-stack';
-
-import { CloudwatchDashboard } from '../src/lib/cloudwatch-dashboard';
 import { env } from 'process';
 import * as path from 'path';
 
@@ -25,6 +23,7 @@ const auroraCluster = new Aurora(app, ENV_NAME + 'AuroraStack', {
   dbName: DB_NAME
 });
 
+// import { CloudwatchDashboard } from '../src/lib/cloudwatch-dashboard';
 // new CloudwatchDashboard(app, ENV_NAME + 'CloudwatchDashboard', {
 //   env: { account: AWS_ACCOUNT, region: AWS_REGION },
 //   description: "Cloudwatch Dashboard Stack",

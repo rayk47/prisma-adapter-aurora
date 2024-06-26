@@ -2,7 +2,10 @@
   "name": "aurora-prisma-adapter",
   "version": "0.0.1",
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "@aws-sdk/client-rds-data": "^3.600.0",
+    "@prisma/driver-adapter-utils": "5.14.0",
+    "lodash": "^4.17.21"
   },
   "type": "commonjs",
   "main": "./src/index.js",

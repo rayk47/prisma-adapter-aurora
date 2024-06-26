@@ -35,8 +35,8 @@ export class Lambdas extends Stack {
 
 
         const prismaBinaryLayer = this.createPrismaBinaryLayer();
-        const setupDatabaseLambda = this.createSetupDatabaseLambda(cluster, dbName);
-        const useAdapterLambda = this.createUseAdapterLambda(cluster, dbName, prismaBinaryLayer);
+        this.createSetupDatabaseLambda(cluster, dbName);
+        this.createUseAdapterLambda(cluster, dbName, prismaBinaryLayer);
     }
 
     createSetupDatabaseLambda = (cluster: DatabaseCluster, dbName: string) => {

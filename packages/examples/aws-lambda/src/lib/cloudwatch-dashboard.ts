@@ -22,10 +22,10 @@ export class CloudwatchDashboard extends Stack {
 
         dashboard.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
-        let dbConnections = auroraCluster.metricDatabaseConnections();
-        let deadlocks = auroraCluster.metricDeadlocks();
-        let metricServerlessDatabaseCapacity = auroraCluster.metricServerlessDatabaseCapacity();
-        let metricACUUtilization = auroraCluster.metricACUUtilization();
+        const dbConnections = auroraCluster.metricDatabaseConnections();
+        const deadlocks = auroraCluster.metricDeadlocks();
+        const metricServerlessDatabaseCapacity = auroraCluster.metricServerlessDatabaseCapacity();
+        const metricACUUtilization = auroraCluster.metricACUUtilization();
 
         //  The average amount of time taken per disk I/O operation (average over 1 minute)
         const readLatency = auroraCluster.metric('ReadLatency', {

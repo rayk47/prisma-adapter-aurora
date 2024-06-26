@@ -70,12 +70,12 @@ export class Aurora extends Stack {
   public cfnOutputConfig = () => {
     new CfnOutput(this, 'OutputSecretName', {
       exportName: this.auroraCluster.stack.stackName + ':SecretName',
-      value: this.auroraCluster.secret?.secretArn!,
+      value: this.auroraCluster.secret!.secretArn!,
     });
 
     new CfnOutput(this, 'OutputSecretArn', {
       exportName: this.auroraCluster.stack.stackName + ':SecretArn',
-      value: this.auroraCluster.secret?.secretArn!,
+      value: this.auroraCluster.secret!.secretArn!,
     });
 
 
@@ -92,7 +92,7 @@ export class Aurora extends Stack {
 
     const instance_endpoints: any = [];
 
-    for (let ie of this.auroraCluster.instanceEndpoints) {
+    for (const ie of this.auroraCluster.instanceEndpoints) {
       instance_endpoints.push(ie.hostname);
     }
     new CfnOutput(this, 'OutputEndpoints', {
@@ -109,27 +109,27 @@ export class Aurora extends Stack {
     // Outputs Cluster Engine
     new CfnOutput(this, 'OutputEngineFamily', {
       exportName: this.auroraCluster.stack.stackName + ':EngineFamily',
-      value: this.auroraCluster.engine?.engineFamily!,
+      value: this.auroraCluster.engine!.engineFamily!,
     });
 
     new CfnOutput(this, 'OutputEngineType', {
       exportName: this.auroraCluster.stack.stackName + ':EngineType',
-      value: this.auroraCluster.engine?.engineType!,
+      value: this.auroraCluster.engine!.engineType!,
     });
 
     new CfnOutput(this, 'OutputEngineFullVersion', {
       exportName: this.auroraCluster.stack.stackName + ':EngineFullVersion',
-      value: this.auroraCluster.engine?.engineVersion?.fullVersion!,
+      value: this.auroraCluster.engine!.engineVersion!.fullVersion!,
     });
 
     new CfnOutput(this, 'OutputEngineMajorVersion', {
       exportName: this.auroraCluster.stack.stackName + ':EngineMajorVersion',
-      value: this.auroraCluster.engine?.engineVersion?.majorVersion!,
+      value: this.auroraCluster.engine!.engineVersion!.majorVersion!,
     });
 
     new CfnOutput(this, 'OutputParameterGroupFamily', {
       exportName: this.auroraCluster.stack.stackName + ':ParameterGroupFamily',
-      value: this.auroraCluster.engine?.parameterGroupFamily!,
+      value: this.auroraCluster.engine!.parameterGroupFamily!,
     });
   }
 }
