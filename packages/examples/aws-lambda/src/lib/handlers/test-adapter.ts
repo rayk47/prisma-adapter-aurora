@@ -22,10 +22,11 @@ const prisma = new PrismaClient({ adapter });
  */
 export const testAdapter = async () => {
     try {
+        const id = `${randomUUID()}`;
         await prisma.user.create({
             data: {
-                name: `${randomUUID()}`,
-                email: `${randomUUID()}@test.com`
+                name: `${id}`,
+                email: `${id}@test.com`
             }
         });
         const allUsers = await prisma.user.findMany();

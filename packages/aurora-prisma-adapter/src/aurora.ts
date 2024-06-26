@@ -24,7 +24,7 @@ import {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils';
 import { name as packageName } from '../package.json';
-import { buildRdsParametersFromValues, transformPrismaSqlQueryToRdsQuery } from './conversion';
+import { buildRdsParametersFromValues, fieldToColumnType, transformPrismaSqlQueryToRdsQuery } from './conversion';
 
 const debug = Debug('prisma:driver-adapter:aurora');
 
@@ -55,11 +55,11 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
 
     return res.map((result) => {
       const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => column.typeName ?? '') : []; //TODO: This likely needs some conversion
-      const rows = result.records ?? []; //TODO: review if this is the correct type. I see the other adapters not marshalling the result data but I don't understand how? Perhaps planetscale and neon have the same result structure?
+      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => fieldToColumnType(column.typeName)) : []; //TODO: This likely needs some conversion
+      const rows = result.records?.map(recordsArray => recordsArray.map(record => record.stringValue)) ?? []; //TODO: review if this is the correct type. I see the other adapters not marshalling the result data but I don't understand how? Perhaps planetscale and neon have the same result structure?
       return {
         columnNames: columnNames,
-        columnTypes: columnTypes as any,
+        columnTypes: columnTypes,
         rows,
       };
     })
