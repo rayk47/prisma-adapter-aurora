@@ -55,8 +55,8 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
 
     return res.map((result) => {
       const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => fieldToColumnType(column.typeName)) : []; //TODO: This likely needs some conversion
-      const rows = result.records?.map(recordsArray => recordsArray.map(record => record.stringValue)) ?? []; //TODO: review if this is the correct type. I see the other adapters not marshalling the result data but I don't understand how? Perhaps planetscale and neon have the same result structure?
+      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => fieldToColumnType(column.typeName)) : [];
+      const rows = result.records?.map(recordsArray => recordsArray.map(record => record.stringValue)) ?? [];
       return {
         columnNames: columnNames,
         columnTypes: columnTypes,
@@ -65,11 +65,6 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
     })
   }
 
-  /**
-   * Execute a query given as SQL, interpolating the given parameters and
-   * returning the number of affected rows.
-   * Note: Queryable expects a u64, but napi.rs only supports u32.
-   */
   async executeRaw(query: Query): Promise<Result<number>> {
     const tag = '[js::executeRaw]';
     debug(`${tag} %O`, query);

@@ -59,6 +59,7 @@ export function fixArrayBufferValues(values: unknown[]) {
     return values;
 }
 
+//TODO needs more extensive testing
 export function fieldToColumnType(field: ColumnMetadata['typeName']): ColumnType {
     switch (field?.toUpperCase()) {
         case 'INT8':
