@@ -43,6 +43,7 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<Result<ResultSet>> {
+    console.log(`We are in the adapter. QueryRaw`, JSON.stringify(query));
     const tag = '[js::query_raw]'
     debug(`${tag} %O`, query)
 
@@ -70,6 +71,7 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<Result<number>> {
+    console.log(`We are in the adapter. ExecuteRaw`, JSON.stringify(query));
     const tag = '[js::execute_raw]'
     debug(`${tag} %O`, query)
 
@@ -94,6 +96,7 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
       includeResultMetadata: true,
       transactionId: this.transactionId,
     }
+    console.log(`Prisma Adapter Query Params`, JSON.stringify(queryParams));
 
     const executeStatementCommand = new ExecuteStatementCommand(queryParams)
     try {

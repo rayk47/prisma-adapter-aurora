@@ -1,3 +1,4 @@
 set -a # automatically export all variables
-export $(grep -v '^#' ./.env | xargs)
+BASEDIR=$(dirname $0)
+export $(grep -v '^#' ${BASEDIR}/.env | xargs)
 set +a

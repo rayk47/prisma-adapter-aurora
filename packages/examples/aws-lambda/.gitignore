@@ -9,3 +9,4 @@ node_modules
 cdk.out
 dist
 .env
+src/lib/handlers/prisma/client

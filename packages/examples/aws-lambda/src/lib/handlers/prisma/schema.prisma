@@ -1,0 +1,17 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+    binaryTargets   = ["native", "rhel-openssl-3.0.x"]
+    output          = "./client"
+}
+
+datasource db {
+    provider     = "postgres"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+
+model User {
+    name  String
+    email String @unique
+}

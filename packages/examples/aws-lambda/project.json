@@ -17,6 +17,30 @@
         "assets": [
           "packages/examples/aws-lambda/*.md"
         ]
+      },
+      "dependsOn": [
+        "build-prisma-client",
+        {
+          "target": "build",
+          "dependencies": true
+        }
+      ]
+    },
+    "build-prisma-client": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx prisma generate --schema=packages/examples/aws-lambda/src/lib/handlers/prisma/schema.prisma"
+        ]
+      }
+    },
+    "build-prisma-migrations": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "echo this currently does not work when run from NX. See https://github.com/prisma/prisma/issues/4669. Please run from your command line.",
+          "npx prisma migrate dev --schema=packages/examples/aws-lambda/src/lib/handlers/prisma/schema.prisma"
+        ]
       }
     },
     "deploy": {
@@ -32,10 +56,7 @@
         "parallel": false
       },
       "dependsOn": [
-        {
-          "target": "build",
-          "dependencies": true
-        }
+        "build"
       ]
     },
     "deploy-lambdas": {
@@ -51,10 +72,7 @@
         "parallel": false
       },
       "dependsOn": [
-        {
-          "target": "build",
-          "dependencies": true
-        }
+        "build"
       ]
     },
     "destroy": {
@@ -99,5 +117,8 @@
         }
       ]
     }
-  }
+  },
+  "implicitDependencies": [
+    "aurora-prisma-adapter"
+  ]
 }
