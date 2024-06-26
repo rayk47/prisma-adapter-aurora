@@ -14,28 +14,11 @@ export const setupDatabase = async () => {
     const secretArn = env['SECRET_ARN']!;
     const dbName = env['DATABASE_NAME']!;
 
-    const dropTable = 'DROP TABLE IF EXISTS "PrismaRdsDataApi"."User"';
-    const dropSchema = 'DROP SCHEMA IF EXISTS "PrismaRdsDataApi"';
-    const createSchema = 'CREATE SCHEMA "PrismaRdsDataApi"';
-    const createUserTable = 'CREATE TABLE "PrismaRdsDataApi"."User" ("name" TEXT NOT NULL, "email" TEXT NOT NULL);';
-    const createUniqueIndex = 'CREATE UNIQUE INDEX "User_email_key" ON "PrismaRdsDataApi"."User"("email");';
-    const createInitialUserSql = `INSERT INTO "PrismaRdsDataApi"."User" (name, email) VALUES ('test', '${randomUUID()}@test.com');`
-    const selectAll = "SELECT \"PrismaRdsDataApi\".\"User\".\"email\", \"PrismaRdsDataApi\".\"User\".\"name\" FROM \"PrismaRdsDataApi\".\"User\" WHERE 1=1";
-
-    // const createInitialUserParameters = [
-    //     {
-    //         name: 'name',
-    //         value: {
-    //             stringValue: randomUUID()
-    //         }
-    //     },
-    //     {
-    //         name: 'email',
-    //         value: {
-    //             stringValue: `${randomUUID()}@test.com`
-    //         }
-    //     }
-    // ]
+    const dropTable = 'DROP TABLE IF EXISTS "User"';
+    const createUserTable = 'CREATE TABLE "User" ("name" TEXT NOT NULL, "email" TEXT NOT NULL);';
+    const createUniqueIndex = 'CREATE UNIQUE INDEX "User_email_key" ON "User"("email");';
+    const createInitialUserSql = `INSERT INTO "User" (name, email) VALUES ('test', '${randomUUID()}@test.com');`
+    const selectAll = "SELECT \"User\".\"email\", \"User\".\"name\" FROM \"User\" WHERE 1=1";
 
     try {
         const transactionId = await beginTransaction({
@@ -50,22 +33,6 @@ export const setupDatabase = async () => {
             dbName,
             transactionId,
             sql: dropTable
-        });
-
-        await performQueryInExistingTransaction({
-            clusterArn,
-            secretArn,
-            dbName,
-            transactionId,
-            sql: dropSchema
-        });
-
-        await performQueryInExistingTransaction({
-            clusterArn,
-            secretArn,
-            dbName,
-            transactionId,
-            sql: createSchema
         });
 
         await performQueryInExistingTransaction({
@@ -89,8 +56,7 @@ export const setupDatabase = async () => {
             secretArn,
             dbName,
             transactionId,
-            sql: createInitialUserSql,
-            // parameters: createInitialUserParameters
+            sql: createInitialUserSql
         });
 
         await performQueryInExistingTransaction({
@@ -109,9 +75,6 @@ export const setupDatabase = async () => {
 
         return { statusCode: 200, body: JSON.stringify(finalCommit) };
     } catch (error: any) {
-        const { requestId, cfId, extendedRequestId } = error.$metadata;
-        console.log({ requestId, cfId, extendedRequestId });
-
         return { statusCode: 400, body: JSON.stringify(error) };
 
     }
@@ -157,7 +120,6 @@ const performQueryInExistingTransaction = async (params: {
         console.log(`performQueryInExistingTransaction Query`, JSON.stringify(queryParams));
         const command = new ExecuteStatementCommand(queryParams);
         const data = await client.send(command);
-        console.log(`performQueryInExistingTransaction SUCCESS`, JSON.stringify(data));
         return data;
     } catch (error) {
         console.log(`performQueryInExistingTransaction FAILURE`, JSON.stringify({ sql: queryParams.sql, parameters: queryParams.parameters }));

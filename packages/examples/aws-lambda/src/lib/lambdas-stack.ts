@@ -81,6 +81,7 @@ export class Lambdas extends Stack {
             depsLockFilePath: path.join(ROOT_OF_PROJECT, 'package-lock.json'),
             layers: [prismaBinaryLayer],
             environment: {
+                DEBUG: "prisma*",
                 RESOURCE_ARN: cluster.clusterArn,
                 SECRET_ARN: cluster.secret!.secretArn,
                 DATABASE_NAME: dbName,

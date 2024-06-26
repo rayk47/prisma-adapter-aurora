@@ -8,7 +8,7 @@ import {
   ExecuteStatementResponse,
   RDSDataClient,
   RollbackTransactionCommand,
-  RollbackTransactionCommandInput,
+  RollbackTransactionCommandInput
 } from '@aws-sdk/client-rds-data';
 import {
   ConnectionInfo,
@@ -24,8 +24,9 @@ import {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils';
 import { name as packageName } from '../package.json';
+import { buildRdsParametersFromValues, transformPrismaSqlQueryToRdsQuery } from './conversion';
 
-const debug = Debug('prisma:driver-adapter:aurora')
+const debug = Debug('prisma:driver-adapter:aurora');
 
 interface AuroraQueryParams {
   readonly resourceArn: string
@@ -43,25 +44,24 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<Result<ResultSet>> {
-    console.log(`We are in the adapter. QueryRaw`, JSON.stringify(query));
-    const tag = '[js::query_raw]'
-    debug(`${tag} %O`, query)
+    const tag = '[js::queryRaw]';
+    debug(`${tag} %O`, query);
 
-    const res = await this.performIO(query)
+    const res = await this.performIO(query);
 
     if (!res.ok) {
-      return err(res.error)
+      return err(res.error);
     }
 
     return res.map((result) => {
-      const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : []
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => column.typeName ?? '') : [] //TODO: This likely needs some conversion
-      const rows = result.records ?? [] //TODO: review if this is the correct type. I see the other adapters not marshalling the result data but I don't understand how? Perhaps planetscale and neon have the same result structure?
+      const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
+      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => column.typeName ?? '') : []; //TODO: This likely needs some conversion
+      const rows = result.records ?? []; //TODO: review if this is the correct type. I see the other adapters not marshalling the result data but I don't understand how? Perhaps planetscale and neon have the same result structure?
       return {
         columnNames: columnNames,
         columnTypes: columnTypes as any,
         rows,
-      }
+      };
     })
   }
 
@@ -71,11 +71,10 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * Note: Queryable expects a u64, but napi.rs only supports u32.
    */
   async executeRaw(query: Query): Promise<Result<number>> {
-    console.log(`We are in the adapter. ExecuteRaw`, JSON.stringify(query));
-    const tag = '[js::execute_raw]'
-    debug(`${tag} %O`, query)
+    const tag = '[js::executeRaw]';
+    debug(`${tag} %O`, query);
 
-    return (await this.performIO(query)).map((r) => r.numberOfRecordsUpdated ?? 0)
+    return (await this.performIO(query)).map((r) => r.numberOfRecordsUpdated ?? 0);
   }
 
   /**
@@ -84,29 +83,30 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * marked as unhealthy.
    */
   private async performIO(query: Query): Promise<Result<ExecuteStatementResponse>> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { sql, args: values } = query //TODO: I think I need to convert these values to RDS Data API SQLParameters type
-
-    const queryParams: ExecuteStatementCommandInput = {
+    const executeStatementCommandInput: ExecuteStatementCommandInput = {
       database: this.queryParams.databaseName,
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
-      sql,
-      // parameters: values,
+      sql: transformPrismaSqlQueryToRdsQuery(query.sql),
+      parameters: buildRdsParametersFromValues(query.args),
       includeResultMetadata: true,
       transactionId: this.transactionId,
-    }
-    console.log(`Prisma Adapter Query Params`, JSON.stringify(queryParams));
+    };
 
-    const executeStatementCommand = new ExecuteStatementCommand(queryParams)
+    const { database, resourceArn, secretArn, ...rdsQueryToLog } = executeStatementCommandInput;
+    const tag = '[js::performIO]';
+
     try {
-      const result = await this.client.send(executeStatementCommand)
-      return ok(result)
+      const executeStatementCommand = new ExecuteStatementCommand(executeStatementCommandInput);
+      debug(`${tag} %O`, rdsQueryToLog);
+      const result = await this.client.send(executeStatementCommand);
+      debug(`${tag} Result %O`, result);
+
+      return ok(result);
     } catch (e) {
       //TODO: Do better error handling
-      const error = e as Error
-      debug('Error in performIO: %O', error)
-      throw error
+      debug('Error in performIO: %O', JSON.stringify(e));
+      throw e;
     }
   }
 }
@@ -122,31 +122,31 @@ class AuroraTransaction extends AuroraQueryable<RDSDataClient> implements Transa
   }
 
   async commit(): Promise<Result<void>> {
-    debug(`[js::commit]`)
+    debug(`[js::commit]`);
 
     const queryParams: CommitTransactionCommandInput = {
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
       transactionId: this.transactionId,
-    }
+    };
 
-    const commitTransactionCommand = new CommitTransactionCommand(queryParams)
-    await this.client.send(commitTransactionCommand)
-    return Promise.resolve(ok(undefined))
+    const commitTransactionCommand = new CommitTransactionCommand(queryParams);
+    await this.client.send(commitTransactionCommand);
+    return Promise.resolve(ok(undefined));
   }
 
   async rollback(): Promise<Result<void>> {
-    debug(`[js::rollback]`)
+    debug(`[js::rollback]`);
 
     const queryParams: RollbackTransactionCommandInput = {
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
       transactionId: this.transactionId,
-    }
+    };
 
-    const rollbackTransactionCommand = new RollbackTransactionCommand(queryParams)
-    await this.client.send(rollbackTransactionCommand)
-    return Promise.resolve(ok(undefined))
+    const rollbackTransactionCommand = new RollbackTransactionCommand(queryParams);
+    await this.client.send(rollbackTransactionCommand);
+    return Promise.resolve(ok(undefined));
   }
 }
 
@@ -158,38 +158,38 @@ export class PrismaAurora extends AuroraQueryable<RDSDataClient> implements Driv
   const client = new RDSDataClient({ region: env.AWS_REGION });
   const adapter = new PrismaAurora(client)
   `)
-    }
-    super(client, queryParams)
+    };
+    super(client, queryParams);
   }
 
   async startTransaction(): Promise<Result<Transaction>> {
     const options: TransactionOptions = {
       usePhantomQuery: true,
-    }
+    };
 
-    const tag = '[js::startTransaction]'
-    debug(`${tag} options: %O`, options)
+    const tag = '[js::startTransaction]';
+    debug(`${tag} options: %O`, options);
 
     const beginTransactionCommandInput: BeginTransactionCommandInput = {
       database: this.queryParams.databaseName,
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
-    }
+    };
 
-    const command = new BeginTransactionCommand(beginTransactionCommandInput)
-    const beginTransactionResponse = await this.client.send(command)
+    const command = new BeginTransactionCommand(beginTransactionCommandInput);
+    const beginTransactionResponse = await this.client.send(command);
 
     if (!beginTransactionResponse.transactionId) {
-      throw new Error(`Unable to create transaction`)
+      throw new Error(`Unable to create transaction`);
     }
-    debug(`${tag} transaction created: %O`, beginTransactionResponse.transactionId)
+    debug(`${tag} transaction created: %O`, beginTransactionResponse.transactionId);
 
-    return ok(new AuroraTransaction(this.client, this.queryParams, beginTransactionResponse.transactionId, options))
+    return ok(new AuroraTransaction(this.client, this.queryParams, beginTransactionResponse.transactionId, options));
   }
 
   getConnectionInfo(): Result<ConnectionInfo> {
     return ok({
-      schemaName: this.queryParams.databaseName,
-    })
+      schemaName: undefined,
+    });
   }
 }

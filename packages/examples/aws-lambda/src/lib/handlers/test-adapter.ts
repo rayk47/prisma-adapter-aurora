@@ -22,14 +22,13 @@ const prisma = new PrismaClient({ adapter });
  * @returns
  */
 export const testAdapter = async () => {
-
     try {
-        // await prisma.user.create({
-        //     data: {
-        //         name: randomUUID(),
-        //         email: `${randomUUID}@test.com`
-        //     }
-        // });
+        await prisma.user.create({
+            data: {
+                name: `${randomUUID()}`,
+                email: `${randomUUID()}@test.com`
+            }
+        });
         const allUsers = await prisma.user.findMany();
 
         return { statusCode: 200, body: JSON.stringify(allUsers) };
