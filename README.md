@@ -46,7 +46,7 @@ npm install aurora-prisma-adapter ## TODO pending publishing to NPM
 npm install "@aws-sdk/client-rds-data"
 ```
 
-Update your Prisma Client instance to use the Aurora serverless client:
+Update your Prisma Client instance to use the Aurora serverless adapter:
 
 ```ts
 // Import needed packages
