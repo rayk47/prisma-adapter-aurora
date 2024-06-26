@@ -1,5 +1,4 @@
 import { RDSDataClient } from '@aws-sdk/client-rds-data';
-
 import { PrismaAurora } from 'aurora-prisma-adapter';
 import { PrismaClient } from './prisma/client';
 import { randomUUID } from 'crypto';

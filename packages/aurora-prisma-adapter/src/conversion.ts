@@ -1,5 +1,3 @@
-//TODO
-
 import { SqlParameter } from "@aws-sdk/client-rds-data";
 
 export const buildRdsParametersFromValues = (values: unknown[]) => {

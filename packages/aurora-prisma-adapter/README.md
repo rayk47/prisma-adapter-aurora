@@ -18,7 +18,6 @@ generator client {
 datasource db {
   provider     = "postgres"
   url          = env("DATABASE_URL")
-  relationMode = "prisma"
 }
 ```
 
@@ -31,7 +30,7 @@ npx prisma generate
 Install the Prisma adapter for Aurora and the Aurora serverless data client packages:
 
 ```sh
-npm install @prisma/adapter-aurora
+npm install aurora-prisma-adapter ## TODO pending publishing to NPM
 npm install "@aws-sdk/client-rds-data"
 ```
 
@@ -39,11 +38,11 @@ Update your Prisma Client instance to use the Aurora serverless client:
 
 ```ts
 // Import needed packages
-import { RDSDataClient } from '@aws-sdk/client-rds-data'
-import { PrismaAurora } from '@prisma/adapter-aurora'
-import { PrismaClient } from '@prisma/client'
+import { RDSDataClient } from '@aws-sdk/client-rds-data';
+import { PrismaAurora } from 'aurora-prisma-adapter';
+import { PrismaClient } from './prisma/client';
 
-// Setup
+// Setup Prisma Client using Aurora Adapter
 const awsRegion = `${process.env['AWS_REGION']}` //The region that the aurora cluster is deployed to
 const resourceArn = `${process.env['RESOURCE_ARN']}` //The ARN of the aurora cluster to connect to
 const secretArn = `${process.env['SECRET_ARN']}` // The database secret that is used for authentication to the cluster. Your Service/Lambda will need access to this see https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_database_secret.html
@@ -52,7 +51,7 @@ const databaseName = `${process.env['DATABASE_NAME']}` // The name of the databa
 // Init prisma client
 const client = new RDSDataClient({ region: awsRegion })
 const adapter = new PrismaAurora(client, { resourceArn, secretArn, databaseName })
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient({ adapter });
 
 // Use Prisma Client as normal
 ```
