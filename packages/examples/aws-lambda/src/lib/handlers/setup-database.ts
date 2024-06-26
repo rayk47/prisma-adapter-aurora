@@ -3,10 +3,9 @@ import { randomUUID } from 'crypto';
 import { env } from 'process';
 
 const client = new RDSDataClient({ region: env['AWS_REGION'] });
+
 /**
  * Test setting up a basic database table
- * @param event
- * @param context
  * @returns
  */
 export const setupDatabase = async () => {

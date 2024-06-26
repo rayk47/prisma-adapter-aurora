@@ -16,9 +16,6 @@ const prisma = new PrismaClient({ adapter });
 
 /**
  * Test the prisma adapter
- * @param event
- * @param context
- * @returns
  */
 export const testAdapter = async () => {
     try {
@@ -36,5 +33,4 @@ export const testAdapter = async () => {
         return { statusCode: 400, body: JSON.stringify(error) };
 
     }
-
 }

@@ -26,6 +26,11 @@ datasource db {
   provider     = "postgres"
   url          = env("DATABASE_URL")
 }
+
+model User {
+    name  String
+    email String @unique
+}
 ```
 
 Generate Prisma Client:
@@ -61,6 +66,27 @@ const adapter = new PrismaAurora(client, { resourceArn, secretArn, databaseName 
 const prisma = new PrismaClient({ adapter });
 
 // Use Prisma Client as normal
+
+/**
+ * Test the prisma adapter
+ */
+export const testAdapter = async () => {
+    try {
+        const id = `${randomUUID()}`;
+        await prisma.user.create({
+            data: {
+                name: `${id}`,
+                email: `${id}@test.com`
+            }
+        });
+        const allUsers = await prisma.user.findMany();
+
+        return { statusCode: 200, body: JSON.stringify(allUsers) };
+    } catch (error: any) {
+        return { statusCode: 400, body: JSON.stringify(error) };
+
+    }
+}
 ```
 
 You can now use Prisma Client as you normally would with full type-safety. Your Prisma Client instance now uses Aurora serverless data client to connect to your database.
