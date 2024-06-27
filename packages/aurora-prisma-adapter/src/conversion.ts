@@ -32,7 +32,7 @@ const convertValueToRDSField = (value: any | any[]): Field => {
     }
     if (isArray(value)) {
         return {
-            'arrayValue': [] as any //TODO: Fix this
+            'arrayValue': [] as any //TODO: Fix this https://github.com/limelighthealth/prisma-adapter-aurora/issues/10
         }
     }
     if (isNumber(value)) {
