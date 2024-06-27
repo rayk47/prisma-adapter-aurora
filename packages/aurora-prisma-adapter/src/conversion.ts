@@ -2,9 +2,11 @@ import { ColumnMetadata, Field, SqlParameter } from "@aws-sdk/client-rds-data";
 import { type ColumnType, ColumnTypeEnum } from '@prisma/driver-adapter-utils';
 import { isArray, isBoolean, isInteger, isNull, isNumber, isString } from 'lodash';
 
+const prefixedParameterVariableName = 'id';
+
 export const buildRdsParametersFromValues = (values: unknown[]) => {
     values = fixArrayBufferValues(values);
-    const parameters: SqlParameter[] = (values).map((param: any, index) => { return { name: String(index + 1), value: getValueTypeAsRDSString(param) } });
+    const parameters: SqlParameter[] = (values).map((param: any, index) => { return { name: prefixedParameterVariableName + String(index + 1), value: getValueTypeAsRDSString(param) } });
     return parameters;
 }
 
@@ -33,7 +35,7 @@ const getValueTypeAsRDSString = (value: any | any[]): Field => {
     }
 }
 export const transformPrismaSqlQueryToRdsQuery = (sql: string) => {
-    return sql.replace(/\$/g, ':'); //TODO nasty hack that needs to be reviewed 
+    return sql.replace(/\$/g, ':' + prefixedParameterVariableName); //TODO nasty hack that needs to be reviewed and fixed
 }
 
 // https://github.com/brianc/node-postgres/pull/2930
