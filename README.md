@@ -96,3 +96,8 @@ You can now use Prisma Client as you normally would with full type-safety. Your 
 We encourage you to create an issue if you find something missing or run into a bug.
 
 If you have any feedback, leave a comment in [this GitHub discussion](https://github.com/prisma/prisma/issues/1964).
+
+## Helpful Resources
+- [Prisma Adapters](https://www.prisma.io/docs/orm/overview/databases/database-drivers)
+- [RDSDataClient Documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/rds-data/)
+- [NPM Library for data api](https://www.npmjs.com/package/@aws-sdk/client-rds-data)
