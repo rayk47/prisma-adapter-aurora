@@ -24,7 +24,7 @@ import {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils';
 import { name as packageName } from '../package.json';
-import { buildRdsParametersFromValues, fieldToColumnType, transformPrismaSqlQueryToRdsQuery } from './conversion';
+import { convertPrismaValuesToRdsParameters, covertFieldToPrismaColumnType, convertPositionalParametersToVariableParameters } from './conversion';
 
 const debug = Debug('prisma:driver-adapter:aurora');
 
@@ -55,7 +55,7 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
 
     return res.map((result) => {
       const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => fieldToColumnType(column.typeName)) : [];
+      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => covertFieldToPrismaColumnType(column.typeName)) : [];
       const rows = result.records?.map(recordsArray => recordsArray.map(record => record.stringValue)) ?? [];
       return {
         columnNames: columnNames,
@@ -74,16 +74,14 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
 
   /**
    * Run a query against the database, returning the result set.
-   * Should the query fail due to a connection error, the connection is
-   * marked as unhealthy.
    */
   private async performIO(query: Query): Promise<Result<ExecuteStatementResponse>> {
     const executeStatementCommandInput: ExecuteStatementCommandInput = {
       database: this.queryParams.databaseName,
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
-      sql: transformPrismaSqlQueryToRdsQuery(query.sql),
-      parameters: buildRdsParametersFromValues(query.args),
+      sql: convertPositionalParametersToVariableParameters(query.sql),
+      parameters: convertPrismaValuesToRdsParameters(query.args),
       includeResultMetadata: true,
       transactionId: this.transactionId,
     };

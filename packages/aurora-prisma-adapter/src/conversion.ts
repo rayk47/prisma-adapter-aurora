@@ -2,15 +2,28 @@ import { ColumnMetadata, Field, SqlParameter } from "@aws-sdk/client-rds-data";
 import { type ColumnType, ColumnTypeEnum } from '@prisma/driver-adapter-utils';
 import { isArray, isBoolean, isInteger, isNull, isNumber, isString } from 'lodash';
 
+/**
+ * Used when converting positional parameters to variable parameters
+ */
 const prefixedParameterVariableName = 'id';
 
-export const buildRdsParametersFromValues = (values: unknown[]) => {
+/**
+ * Converts the Prisma values to RDS Parameters
+ * @param values 
+ * @returns SqlParameter[]
+ */
+export const convertPrismaValuesToRdsParameters = (values: unknown[]) => {
     values = fixArrayBufferValues(values);
-    const parameters: SqlParameter[] = (values).map((param: any, index) => { return { name: prefixedParameterVariableName + String(index + 1), value: getValueTypeAsRDSString(param) } });
+    const parameters: SqlParameter[] = (values).map((param: any, index) => { return { name: prefixedParameterVariableName + String(index + 1), value: convertValueToRDSField(param) } });
     return parameters;
 }
 
-const getValueTypeAsRDSString = (value: any | any[]): Field => {
+/**
+ * Converts a value to RDS Data API field 
+ * @param value 
+ * @returns Field
+ */
+const convertValueToRDSField = (value: any | any[]): Field => {
     if (isNull(value)) {
         return { 'isNull': true }
     }
@@ -34,11 +47,22 @@ const getValueTypeAsRDSString = (value: any | any[]): Field => {
         return { '$unknown': value };
     }
 }
-export const transformPrismaSqlQueryToRdsQuery = (sql: string) => {
+
+/**
+ * See https://github.com/limelighthealth/prisma-adapter-aurora/issues/3 for more context
+ * @param sql 
+ * @returns sql
+ */
+export const convertPositionalParametersToVariableParameters = (sql: string) => {
     return sql.replace(/\$/g, ':' + prefixedParameterVariableName); //TODO nasty hack that needs to be reviewed and fixed
 }
 
-// https://github.com/brianc/node-postgres/pull/2930
+/**
+ * https://github.com/brianc/node-postgres/pull/2930
+ * See https://github.com/limelighthealth/prisma-adapter-aurora/issues/2
+ * @param values 
+ * @returns 
+ */
 export function fixArrayBufferValues(values: unknown[]) {
     for (let i = 0; i < values.length; i++) {
         const list = values[i];
@@ -61,8 +85,13 @@ export function fixArrayBufferValues(values: unknown[]) {
     return values;
 }
 
-//TODO needs more extensive testing
-export function fieldToColumnType(field: ColumnMetadata['typeName']): ColumnType {
+/**
+ * Converts the columns returned by RDS to a corresponding Prisma Column Type that the Prisma Client and Engine can use
+ * Needs more testing. See https://github.com/limelighthealth/prisma-adapter-aurora/issues/5
+ * @param field 
+ * @returns ColumnType
+ */
+export function covertFieldToPrismaColumnType(field: ColumnMetadata['typeName']): ColumnType {
     switch (field?.toUpperCase()) {
         case 'INT8':
         case 'UINT8':
