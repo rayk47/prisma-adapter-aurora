@@ -42,7 +42,7 @@ npx prisma generate
 Install the Prisma adapter for Aurora and the Aurora serverless data client packages:
 
 ```sh
-npm install aurora-prisma-adapter ## TODO pending publishing to NPM
+npm install @raymondjkelly/aurora-prisma-adapter
 npm install "@aws-sdk/client-rds-data"
 ```
 
@@ -51,7 +51,7 @@ Update your Prisma Client instance to use the Aurora serverless adapter:
 ```ts
 // Import needed packages
 import { RDSDataClient } from '@aws-sdk/client-rds-data';
-import { PrismaAurora } from 'aurora-prisma-adapter';
+import { PrismaAurora } from '@raymondjkelly/aurora-prisma-adapter';
 import { PrismaClient } from './prisma/client';
 
 // Setup Prisma Client using Aurora Adapter

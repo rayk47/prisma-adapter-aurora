@@ -18,10 +18,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "aurora-prisma-adapter": [
+      "@raymondjkelly/aurora-prisma-adapter": [
         "packages/aurora-prisma-adapter/src/index.ts"
       ],
-      "examples/aws-lambda": [
+      "examples-aws-lambda": [
         "packages/examples/aws-lambda/src/index.ts"
       ]
     }

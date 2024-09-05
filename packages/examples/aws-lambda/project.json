@@ -119,6 +119,6 @@
     }
   },
   "implicitDependencies": [
-    "aurora-prisma-adapter"
+    "@raymondjkelly/aurora-prisma-adapter"
   ]
 }
