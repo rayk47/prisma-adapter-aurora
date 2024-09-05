@@ -1,6 +1,8 @@
 {
-  "name": "examples/aws-lambda",
+  "name": "examples-aws-lambda",
   "version": "0.0.1",
+  "author": "Raymond Kelly <raymondjaykay@gmail.com.com>",
+  "description": "A sample apple to allow you to test out the adapter",
   "dependencies": {
     "tslib": "^2.3.0",
     "source-map-support": "^0.5.21",
@@ -8,7 +10,7 @@
     "dotenv": "^16.4.5",
     "constructs": "^10.0.0",
     "@aws-sdk/client-rds-data": "^3.600.0",
-    "aurora-prisma-adapter": "0.0.1"
+    "@raymondjkelly/aurora-prisma-adapter": "0.0.1"
   },
   "bin": {
     "aws-lambda": "bin/main.js"
