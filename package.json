@@ -8,8 +8,8 @@
   },
   "private": true,
   "dependencies": {
-    "@prisma/client": "^5.16.0",
-    "@prisma/driver-adapter-utils": "5.14.0",
+    "@prisma/client": "^5.19.1",
+    "@prisma/driver-adapter-utils": "5.19.1",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "eslint-config-prettier": "^9.0.0",
     "nx": "19.3.1",
     "prettier": "^2.6.2",
-    "prisma": "^5.16.0",
+    "prisma": "^5.19.1",
     "typescript": "~5.4.5",
     "lodash": "^4.17.21",
     "@types/lodash": "^4.17.5"
