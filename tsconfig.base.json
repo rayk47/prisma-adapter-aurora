@@ -10,10 +10,7 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
@@ -21,13 +18,8 @@
       "@raymondjkelly/aurora-prisma-adapter": [
         "packages/aurora-prisma-adapter/src/index.ts"
       ],
-      "examples-aws-lambda": [
-        "packages/examples/aws-lambda/src/index.ts"
-      ]
+      "examples-aws-lambda": ["packages/examples/aws-lambda/src/index.ts"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

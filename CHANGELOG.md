@@ -1,3 +1,18 @@
+## 0.1.0 (2024-09-06)
+
+
+### 🚀 Features
+
+- **adapter:** simple queires now working ([63cba62](https://github.com/rayk47/prisma-adapter-aurora/commit/63cba62))
+- **adapter:** simple queires now working ([2506bc4](https://github.com/rayk47/prisma-adapter-aurora/commit/2506bc4))
+- **npm:** publish ([a682c74](https://github.com/rayk47/prisma-adapter-aurora/commit/a682c74))
+- **prisma:** upgrade prisma to 5.19.1 ([180259a](https://github.com/rayk47/prisma-adapter-aurora/commit/180259a))
+
+### ❤️  Thank You
+
+- Ray Kelly
+- rayk47
+
 # 1.0.0 (2024-09-06)
 
 
