@@ -18,6 +18,12 @@
           "packages/aurora-prisma-adapter/*.md"
         ]
       }
+    },
+    "release": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "command": "semantic-release"
+      }
     }
   }
 }

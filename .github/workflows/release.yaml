@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build workspace (Nx)
-        run: npm run build
+      # - name: Build workspace (Nx)
+      #   run: npm run build
 
       - name: Run semantic-release
         env:
