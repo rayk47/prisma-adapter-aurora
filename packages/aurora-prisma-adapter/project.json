@@ -22,6 +22,7 @@
     "release-adapter": {
       "executor": "nx:run-commands",
       "options": {
+        "cwd": "packages/aurora-prisma-adapter",
         "command": "semantic-release"
       },
       "dependsOn": [
