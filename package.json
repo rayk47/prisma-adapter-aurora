@@ -4,7 +4,8 @@
   "author": "Raymond Kelly <raymondjaykay@gmail.com.com>",
   "scripts": {
     "lint": "nx run-many --target=lint --all",
-    "build": "nx run-many --target=build --all"
+    "build": "nx run-many --target=build --all",
+    "release": "nx release"
   },
   "private": true,
   "dependencies": {
