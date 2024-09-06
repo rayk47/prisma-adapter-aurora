@@ -23,7 +23,10 @@
       "executor": "@nx/workspace:run-commands",
       "options": {
         "command": "semantic-release"
-      }
+      },
+      "dependsOn": [
+        "build"
+      ]
     }
   }
 }

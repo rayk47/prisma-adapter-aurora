@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "nx run-many --target=lint --all",
     "build": "nx run-many --target=build --all",
-    "release": "nx affected --target=build && nx affected --target=release"
+    "release": "nx run-many --target=release --all"
   },
   "private": true,
   "dependencies": {
