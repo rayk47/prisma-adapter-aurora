@@ -19,7 +19,7 @@
         ]
       }
     },
-    "release": {
+    "release-adapter": {
       "executor": "nx:run-commands",
       "options": {
         "command": "semantic-release"

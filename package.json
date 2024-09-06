@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "nx run-many --target=lint --all",
     "build": "nx run-many --target=build --all",
-    "release": "nx release @raymondjkelly/aurora-prisma-adapter"
+    "release": "nx release-adapter @raymondjkelly/aurora-prisma-adapter"
   },
   "private": true,
   "dependencies": {
