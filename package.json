@@ -1,6 +1,6 @@
 {
   "name": "prisma-adapter-aurora",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Raymond Kelly <raymondjaykay@gmail.com.com>",
   "scripts": {
     "lint": "nx run-many --target=lint --all",
