@@ -1,6 +1,6 @@
 {
   "name": "@raymondjkelly/aurora-prisma-adapter",
-  "version": "0.2.0",
+  "version": "0.3.0-0",
   "author": "Raymond Kelly <raymondjaykay@gmail.com.com>",
   "description": "A Prisma driver adapter for Aurora Serverless Data Client",
   "dependencies": {
