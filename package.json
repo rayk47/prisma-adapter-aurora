@@ -1,11 +1,10 @@
 {
   "name": "prisma-adapter-aurora",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "Raymond Kelly <raymondjaykay@gmail.com.com>",
   "scripts": {
     "lint": "nx run-many --target=lint --all",
-    "build": "nx run-many --target=build --all",
-    "release": "nx run-many --target=build --all && semantic-release"
+    "build": "nx run-many --target=build --all"
   },
   "private": true,
   "dependencies": {
@@ -18,10 +17,6 @@
     "@nx/eslint": "19.3.1",
     "@nx/eslint-plugin": "19.3.1",
     "@nx/js": "19.3.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^10.3.3",
-    "@semantic-release/npm": "^12.0.1",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
@@ -40,7 +35,6 @@
     "nx": "19.3.1",
     "prettier": "^2.6.2",
     "prisma": "^5.19.1",
-    "semantic-release": "^24.1.0",
     "typescript": "~5.4.5"
   },
   "peerDependencies": {

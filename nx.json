@@ -23,6 +23,11 @@
     "appsDir": "packages",
     "libsDir": "packages"
   },
+  "release": {
+    "projects": [
+      "packages/aurora-prisma-adapter"
+    ]
+  },
   "plugins": [
     {
       "plugin": "@nx/eslint/plugin",
