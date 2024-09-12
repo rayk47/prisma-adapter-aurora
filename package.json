@@ -1,15 +1,16 @@
 {
   "name": "prisma-adapter-aurora",
-  "version": "0.0.0",
-  "author": "Raymond Kelly <Raymond.Kelly@FINEOS.com>",
+  "version": "0.0.1",
+  "author": "Raymond Kelly <raymondjaykay@gmail.com.com>",
   "scripts": {
     "lint": "nx run-many --target=lint --all",
-    "build": "nx run-many --target=lint --all"
+    "build": "nx run-many --target=build --all",
+    "release": "nx release-adapter @raymondjkelly/aurora-prisma-adapter"
   },
   "private": true,
   "dependencies": {
-    "@prisma/client": "^5.16.0",
-    "@prisma/driver-adapter-utils": "5.14.0",
+    "@prisma/client": "^5.19.1",
+    "@prisma/driver-adapter-utils": "5.19.1",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
@@ -17,10 +18,15 @@
     "@nx/eslint": "19.3.1",
     "@nx/eslint-plugin": "19.3.1",
     "@nx/js": "19.3.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.3.3",
+    "@semantic-release/npm": "^12.0.1",
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
     "@types/aws-lambda": "^8.10.140",
+    "@types/lodash": "^4.17.5",
     "@types/node": "20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.3.0",
     "@typescript-eslint/parser": "^7.3.0",
@@ -30,12 +36,12 @@
     "dotenv": "^16.4.5",
     "eslint": "~8.57.0",
     "eslint-config-prettier": "^9.0.0",
+    "lodash": "^4.17.21",
     "nx": "19.3.1",
     "prettier": "^2.6.2",
-    "prisma": "^5.16.0",
-    "typescript": "~5.4.5",
-    "lodash": "^4.17.21",
-    "@types/lodash": "^4.17.5"
+    "prisma": "^5.19.1",
+    "semantic-release": "^24.1.0",
+    "typescript": "~5.4.5"
   },
   "peerDependencies": {
     "@aws-sdk/client-rds-data": "^3.600.0"

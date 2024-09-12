@@ -1,5 +1,5 @@
 {
-  "name": "aurora-prisma-adapter",
+  "name": "@raymondjkelly/aurora-prisma-adapter",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/aurora-prisma-adapter/src",
   "projectType": "library",
@@ -18,6 +18,16 @@
           "packages/aurora-prisma-adapter/*.md"
         ]
       }
+    },
+    "release-adapter": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "packages/aurora-prisma-adapter",
+        "command": "semantic-release"
+      },
+      "dependsOn": [
+        "build"
+      ]
     }
   }
 }
