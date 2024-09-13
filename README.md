@@ -30,7 +30,7 @@ npx prisma generate
 Install the Prisma adapter for Aurora and the Aurora serverless data client packages:
 
 ```sh
-npm install @raymondjkelly/aurora-prisma-adapter
+npm install @raymondjkelly/@raymondjkelly/prisma-adapter-aurora
 npm install "@aws-sdk/client-rds-data"
 ```
 
@@ -39,7 +39,7 @@ Update your Prisma Client instance to use the Aurora serverless adapter:
 ```ts
 // Import needed packages
 import { RDSDataClient } from '@aws-sdk/client-rds-data';
-import { PrismaAurora } from '@raymondjkelly/aurora-prisma-adapter';
+import { PrismaAurora } from '@raymondjkelly/prisma-adapter-aurora';
 import { PrismaClient } from './prisma/client';
 
 // Setup Prisma Client using Aurora Adapter
@@ -78,6 +78,9 @@ export const testAdapter = async () => {
 ```
 
 You can now use Prisma Client as you normally would with full type-safety. Your Prisma Client instance now uses Aurora serverless data client to connect to your database.
+
+## Test out the adapter
+If you would like to test out the adapter or contribute you can use the [Sandbox](https://github.com/rayk47/sandbox-prisma-adapter-aurora) to quickly spin up a database and try running some queries.
 
 ## Feedback
 
