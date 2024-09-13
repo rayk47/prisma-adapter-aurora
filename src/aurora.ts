@@ -25,6 +25,7 @@ import {
 } from '@prisma/driver-adapter-utils';
 import { name as packageName } from '../package.json';
 import { convertPrismaValuesToRdsParameters, covertFieldToPrismaColumnType, convertPositionalParametersToVariableParameters } from './conversion';
+import { omit } from 'lodash';
 
 const debug = Debug('prisma:driver-adapter:aurora');
 
@@ -86,7 +87,7 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
       transactionId: this.transactionId,
     };
 
-    const { database, resourceArn, secretArn, ...rdsQueryToLog } = executeStatementCommandInput;
+    const rdsQueryToLog = omit(executeStatementCommandInput, 'database', 'resourceArn', 'secretArn');
     const tag = '[js::performIO]';
 
     try {
