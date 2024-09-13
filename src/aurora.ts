@@ -152,7 +152,7 @@ export class PrismaAurora extends AuroraQueryable<RDSDataClient> implements Driv
   const client = new RDSDataClient({ region: env.AWS_REGION });
   const adapter = new PrismaAurora(client)
   `)
-    };
+    }
     super(client, queryParams);
   }
 
