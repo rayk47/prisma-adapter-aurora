@@ -14,7 +14,7 @@ const prefixedParameterVariableName = 'id';
  */
 export const convertPrismaValuesToRdsParameters = (values: unknown[]) => {
     values = fixArrayBufferValues(values);
-    const parameters: SqlParameter[] = (values).map((param: any, index) => { return { name: prefixedParameterVariableName + String(index + 1), value: convertValueToRDSField(param) } });
+    const parameters: SqlParameter[] = (values).map((param: unknown, index) => { return { name: prefixedParameterVariableName + String(index + 1), value: convertValueToRDSField(param) } });
     return parameters;
 }
 
