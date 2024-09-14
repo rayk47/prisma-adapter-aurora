@@ -12,7 +12,9 @@
     "url": "https://github.com/rayk47/prisma-adapter-aurora/issues"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "package.json"
   ],
   "homepage": "https://github.com/rayk47/prisma-adapter-aurora#readme",
   "main": "dist/src/index.js",
