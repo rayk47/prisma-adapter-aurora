@@ -1,1 +1,0 @@
-export { PrismaAurora } from './aurora'

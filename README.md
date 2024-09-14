@@ -1,15 +1,8 @@
-# PrismaAdapterAurora
+# Prisma driver adapter for Aurora serverless driver
 
 Prisma driver adapter for [Aurora Serverless Data Client](https://www.npmjs.com/package/@aws-sdk/client-rds-data).
 
 Aurora serverless client provides a way of communicating with your Aurora Serverless database over HTTP which can improve connection reliability, connection management, security and also performance in a serverless architecture.
-
-This repo is an NX based monorepo and contains 2 main projects.
-
-1. [aurora-prisma-adapter](packages/aurora-prisma-adapter) this package is the adapter to use with prisma
-2. [examples/aws-lambda](packages/examples/aws-lambda) this is a package that uses CDK to standup an example database so that you can test using the adapter
-
-You can follow the README.MD for each project to see how the adapter works and how you can standup a test database.
 
 ## Getting started
 
@@ -26,11 +19,6 @@ datasource db {
   provider     = "postgres"
   url          = env("DATABASE_URL")
 }
-
-model User {
-    name  String
-    email String @unique
-}
 ```
 
 Generate Prisma Client:
@@ -42,7 +30,7 @@ npx prisma generate
 Install the Prisma adapter for Aurora and the Aurora serverless data client packages:
 
 ```sh
-npm install aurora-prisma-adapter ## TODO pending publishing to NPM
+npm install @raymondjkelly/@raymondjkelly/prisma-adapter-aurora
 npm install "@aws-sdk/client-rds-data"
 ```
 
@@ -51,7 +39,7 @@ Update your Prisma Client instance to use the Aurora serverless adapter:
 ```ts
 // Import needed packages
 import { RDSDataClient } from '@aws-sdk/client-rds-data';
-import { PrismaAurora } from 'aurora-prisma-adapter';
+import { PrismaAurora } from '@raymondjkelly/prisma-adapter-aurora';
 import { PrismaClient } from './prisma/client';
 
 // Setup Prisma Client using Aurora Adapter
@@ -91,14 +79,11 @@ export const testAdapter = async () => {
 
 You can now use Prisma Client as you normally would with full type-safety. Your Prisma Client instance now uses Aurora serverless data client to connect to your database.
 
+## Test out the adapter
+If you would like to test out the adapter or contribute you can use the [Sandbox](https://github.com/rayk47/sandbox-prisma-adapter-aurora) to quickly spin up a database and try running some queries.
+
 ## Feedback
 
 We encourage you to create an issue if you find something missing or run into a bug.
 
 If you have any feedback, leave a comment in [this GitHub discussion](https://github.com/prisma/prisma/issues/1964).
-
-## Helpful Resources
-- [Prisma Adapters](https://www.prisma.io/docs/orm/overview/databases/database-drivers)
-- [RDSDataClient Documentation](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/rds-data/)
-- [NPM Library for data api](https://www.npmjs.com/package/@aws-sdk/client-rds-data)
-- [Using RDS Data API](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html)
