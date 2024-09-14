@@ -25,14 +25,6 @@ jobs:
       - name: Build Adapter
         run: npm run build
 
-      - name: Run semantic-release debug
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          DEBUG: semantic-release*,@semantic-release/*
-        run: npx semantic-release --no-ci --debug && npm run release
-
       - name: Run semantic-release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
