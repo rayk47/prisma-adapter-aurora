@@ -12,9 +12,9 @@
     ],
     "verifyConditions": [
         "@semantic-release/changelog",
-        "@semantic-release/git",
         "@semantic-release/npm",
-        "@semantic-release/github"
+        "@semantic-release/github",
+        "@semantic-release/git"
     ],
     "prepare": [
         {
@@ -36,7 +36,7 @@
     "publish": [
         {
             "path": "@semantic-release/npm",
-            "npmPublish": true,
+            "npmPublish": true
         },
         {
             "path": "@semantic-release/github"
