@@ -24,8 +24,9 @@ import {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils';
 import { name as packageName } from '../package.json';
-import { convertPrismaValuesToRdsParameters, covertFieldToPrismaColumnType, convertPositionalParametersToVariableParameters, convertRDSFieldToValue } from './conversion';
 import { omit } from 'lodash';
+import { convertSql, convertParameters } from './conversion/prismaToRds';
+import { convertColumnType, convertValue } from './conversion/rdsToPrisma';
 
 const debug = Debug('prisma:driver-adapter:aurora');
 
@@ -54,8 +55,8 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
     console.log(`Temp log Starting Building adapter response`)
     const response = res.map((result) => {
       const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => covertFieldToPrismaColumnType(column.typeName)) : [];
-      const rows = result.records?.map(recordsArray => recordsArray.map(record => convertRDSFieldToValue(record))) ?? [];
+      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => convertColumnType(column.typeName)) : [];
+      const rows = result.records?.map(recordsArray => recordsArray.map(record => convertValue(record))) ?? [];
       return {
         columnNames: columnNames,
         columnTypes: columnTypes,
@@ -86,8 +87,8 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
       database: this.queryParams.databaseName,
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
-      sql: convertPositionalParametersToVariableParameters(query.sql),
-      parameters: convertPrismaValuesToRdsParameters(query.args, query.argTypes),
+      sql: convertSql(query.sql),
+      parameters: convertParameters(query.args, query.argTypes),
       includeResultMetadata: true,
       transactionId: this.transactionId,
     };
