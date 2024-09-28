@@ -1,5 +1,7 @@
 import { ColumnMetadata, Field } from "@aws-sdk/client-rds-data";
-import { ColumnType, ColumnTypeEnum } from "@prisma/driver-adapter-utils";
+import { ColumnType, ColumnTypeEnum, Debug } from "@prisma/driver-adapter-utils";
+
+const debug = Debug('prisma:driver-adapter:aurora');
 
 /**
  * Convert the column type returned by RDS to a column type that Prisma can process
@@ -9,6 +11,7 @@ import { ColumnType, ColumnTypeEnum } from "@prisma/driver-adapter-utils";
 export const convertColumnType = (typeName: ColumnMetadata['typeName']): ColumnType => {
     //TODO may need to dig into how null is handled
     switch (typeName?.toUpperCase()) {
+        case 'SERIAL':
         case 'INT2':
         case 'INT4':
             return ColumnTypeEnum.Int32;
@@ -77,7 +80,8 @@ export const convertColumnType = (typeName: ColumnMetadata['typeName']): ColumnT
         case 'UUID[]':
             return ColumnTypeEnum.UuidArray;
         default:
-            throw new Error(`Unsupported column type: ${field}`);
+            debug(`[js::convertColumnType] Unsupported RDS column type ${typeName}. Please raise a github issue asking for support of this type %O`);
+            throw new Error(`Unsupported column type: ${typeName}`);
     }
 }
 
@@ -102,5 +106,7 @@ export const convertValue = (field: Field) => {
     } else if (field.arrayValue) {
         //TODO: Fix this https://github.com/rayk47/prisma-adapter-aurora/issues/10
         return field.arrayValue;
+    } else {
+        debug(`[js::convertValue] RDS Data API field ${field} is not supported for value conversion. Please raise a github issue asking for support of this field %O`, field);
     }
 }

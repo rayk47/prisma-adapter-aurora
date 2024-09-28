@@ -1,6 +1,8 @@
-import { ArgType } from "@prisma/driver-adapter-utils";
+import { ArgType, Debug } from "@prisma/driver-adapter-utils";
 import { Field, SqlParameter, TypeHint } from "@aws-sdk/client-rds-data";
 import { isArray, isNil } from "lodash";
+
+const debug = Debug('prisma:driver-adapter:aurora');
 
 /**
  * Used when converting positional parameters to variable parameters
@@ -49,40 +51,47 @@ const getTypeHint = (argType: ArgType): TypeHint | undefined => {
     }
 }
 
-const getRdsField = (value: any | any[], argType: ArgType): Field => {
+//TODO needs more type checking, and nil checking
+const getRdsField = (value: unknown | unknown[], argType: ArgType): Field => {
     switch (argType) {
         case 'Int32':
         case 'Int64':
-            return { 'longValue': value };
+            debug(`[js::getRdsField] Converting ${argType} to longValue with value ${value} %O`);
+            return { 'longValue': value as number };
         case 'Float':
         case 'Double':
-            return { 'doubleValue': value };
+            debug(`[js::getRdsField] Converting ${argType} to doubleValue with value ${value} %O`);
+            return { 'doubleValue': value as number };
         case 'Text':
         case 'Char':
-            return { 'stringValue': value };
+        case 'Json':
+        case 'Xml':
+        case 'Uuid':
+        case 'DateTime':
+        case 'Date':
+        case 'Time':
+            debug(`[js::getRdsField] Converting ${argType} to stringValue with value ${value} %O`);
+            return { 'stringValue': value as string };
         case 'Enum':
         case 'EnumArray': // Handle Enums and Enum Arrays as Text values. TODO the enum array needs testing
-            return { 'stringValue': value };
+            debug(`[js::getRdsField] Converting ${argType} to stringValue with value ${value} %O`);
+            return { 'stringValue': value as string };
         case 'Bytes':
-            return { 'blobValue': value };
+            debug(`[js::getRdsField] Converting ${argType} to blobValue with value ${value} %O`);
+            return { 'blobValue': value as Uint8Array };
         case 'Boolean':
-            return { 'booleanValue': value };
+            debug(`[js::getRdsField] Converting ${argType} to booleanValue with value ${value} %O`);
+            return { 'booleanValue': value as boolean };
         case 'Array':
+            debug(`[js::getRdsField] Converting ${argType} to arrayValue with value ${value} %O`);
             //TODO: Fix this https://github.com/rayk47/prisma-adapter-aurora/issues/10
             return isArray(value) ? { 'arrayValue': { 'arrayValues': [] } } : { 'isNull': true };
         // return isArray(value) ? { 'arrayValue': { 'arrayValues': value.map(v => convertValueToRDSField(v)) } } : { 'isNull': true };
         case 'Numeric':
-            return isNil(value) ? { 'isNull': true } : { 'doubleValue': parseFloat(value) };
-        case 'Json':
-        case 'Xml':
-            return { 'stringValue': value };
-        case 'Uuid':
-            return { 'stringValue': value };
-        case 'DateTime':
-        case 'Date':
-        case 'Time':
-            return { 'stringValue': value };
+            debug(`[js::getRdsField] Converting ${argType} to doubleValue with value ${value} %O`);
+            return isNil(value) ? { 'isNull': true } : { 'doubleValue': parseFloat(value as string) };
         default:
+            debug(`[js::getRdsField] Unsupported Prisma Type ${argType}. Please raise a github issue asking for support of this type %O`, argType);
             throw new Error(`Unsupported ArgType: ${argType}`);
     }
 }

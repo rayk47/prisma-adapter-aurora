@@ -72,6 +72,10 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
   async executeRaw(query: Query): Promise<Result<number>> {
     const res = (await this.performIO(query)).map((r) => r.numberOfRecordsUpdated ?? 0);
 
+    if (!res.ok) {
+      return err(res.error);
+    }
+
     return res;
   }
 
@@ -102,10 +106,15 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
       debug(`${tag} Result %O`, result);
 
       return ok(result);
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       //TODO: Do better error handling
-      debug('Error in performIO: %O', JSON.stringify(e));
-      throw e;
+      debug('Error in performIO: %O', JSON.stringify(error));
+      return err({
+        ...error,
+        'kind': 'Postgres',
+        'message': 'message' in error ? error?.message : 'Unknown Error',
+      });
     }
   }
 }
