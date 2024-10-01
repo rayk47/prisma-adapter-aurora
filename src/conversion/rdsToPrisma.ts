@@ -90,7 +90,7 @@ export const convertColumnType = (typeName: ColumnMetadata['typeName']): ColumnT
  * @param field 
  * @returns a prisma compatible value
  */
-export const convertValue = (field: Field) => {
+export const convertValue = (field: Field, columnType: ColumnType) => {
     if (field.stringValue) {
         return field.stringValue;
     } else if (field.doubleValue) {
@@ -100,7 +100,9 @@ export const convertValue = (field: Field) => {
     } else if (field.blobValue) {
         return field.blobValue;
     } else if (field.longValue) {
-        return field.longValue;
+        if (columnType === ColumnTypeEnum.Int64) {
+            return BigInt(field.longValue).toString()
+        } else { return field.longValue };
     } else if (field.isNull) {
         return null;
     } else if (field.arrayValue) {
@@ -108,5 +110,6 @@ export const convertValue = (field: Field) => {
         return field.arrayValue;
     } else {
         debug(`[js::convertValue] RDS Data API field ${field} is not supported for value conversion. Please raise a github issue asking for support of this field %O`, field);
+        throw new Error(`Unsupported RDS Data API field ${field}`);
     }
 }

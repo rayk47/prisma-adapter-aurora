@@ -27,6 +27,7 @@ import { name as packageName } from '../package.json';
 import { omit } from 'lodash';
 import { convertSql, convertParameters } from './conversion/prismaToRds';
 import { convertColumnType, convertValue } from './conversion/rdsToPrisma';
+import { inspect } from 'util';
 
 const debug = Debug('prisma:driver-adapter:aurora');
 
@@ -46,27 +47,43 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<Result<ResultSet>> {
-    const res = await this.performIO(query);
+    try {
+      const res = await this.performIO(query);
 
-    if (!res.ok) {
-      return err(res.error);
+      if (!res.ok) {
+        return err(res.error);
+      }
+
+      const response = res.map((result) => {
+        const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
+        const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => convertColumnType(column.typeName)) : [];
+        const rows = result.records?.map(recordsArray => recordsArray.map((record, index) => convertValue(record, columnTypes[index]!))) ?? [];
+
+        return {
+          columnNames: columnNames,
+          columnTypes: columnTypes,
+          rows,
+        };
+      });
+      debug(`[js::queryRaw] RDS Response Converted to Prisma %O`, JSON.stringify(
+        response,
+        (key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
+      ));
+
+      return response;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      debug(`[js::queryRaw] Error %O`, inspect(error));
+      return err({
+        'kind': 'Postgres',
+        severity: 'Critical',
+        code: 'P2036',
+        detail: 'queryRaw: Failed to covert from RDS Data API to Prisma',
+        ...error,
+        'message': 'message' in error ? error?.message : 'Unknown Error',
+      });
     }
 
-    console.log(`Temp log Starting Building adapter response`)
-    const response = res.map((result) => {
-      const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => convertColumnType(column.typeName)) : [];
-      const rows = result.records?.map(recordsArray => recordsArray.map(record => convertValue(record))) ?? [];
-      return {
-        columnNames: columnNames,
-        columnTypes: columnTypes,
-        rows,
-      };
-    });
-
-    console.log(`Temp log. Finished Building adapter response`, JSON.stringify(response))
-
-    return response;
   }
 
   async executeRaw(query: Query): Promise<Result<number>> {
