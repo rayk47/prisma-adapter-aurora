@@ -24,8 +24,10 @@ import {
   TransactionOptions,
 } from '@prisma/driver-adapter-utils';
 import { name as packageName } from '../package.json';
-import { convertPrismaValuesToRdsParameters, covertFieldToPrismaColumnType, convertPositionalParametersToVariableParameters } from './conversion';
 import { omit } from 'lodash';
+import { convertSql, convertParameters } from './conversion/prismaToRds';
+import { convertColumnType, convertValue } from './conversion/rdsToPrisma';
+import { inspect } from 'util';
 
 const debug = Debug('prisma:driver-adapter:aurora');
 
@@ -45,62 +47,88 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
    * Execute a query given as SQL, interpolating the given parameters.
    */
   async queryRaw(query: Query): Promise<Result<ResultSet>> {
-    const tag = '[js::queryRaw]';
-    debug(`${tag} %O`, query);
+    try {
+      const res = await this.performIO(query);
 
-    const res = await this.performIO(query);
+      if (!res.ok) {
+        return err(res.error);
+      }
+
+      const response = res.map((result) => {
+        const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
+        const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => convertColumnType(column.typeName)) : [];
+        const rows = result.records?.map(recordsArray => recordsArray.map((record, index) => convertValue(record, columnTypes[index]!))) ?? [];
+
+        return {
+          columnNames: columnNames,
+          columnTypes: columnTypes,
+          rows,
+        };
+      });
+      debug(`[js::queryRaw] RDS Response Converted to Prisma %O`, JSON.stringify(response));
+
+      return response;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      debug(`[js::queryRaw] Error %O`, inspect(error));
+      return err({
+        'kind': 'Postgres',
+        severity: 'Critical',
+        code: 'P2036',
+        detail: 'queryRaw: Failed to covert from RDS Data API to Prisma',
+        ...error,
+        'message': 'message' in error ? error?.message : 'Unknown Error',
+      });
+    }
+
+  }
+
+  async executeRaw(query: Query): Promise<Result<number>> {
+    const res = (await this.performIO(query)).map((r) => r.numberOfRecordsUpdated ?? 0);
 
     if (!res.ok) {
       return err(res.error);
     }
 
-    return res.map((result) => {
-      const columnNames = result.columnMetadata ? result.columnMetadata?.map((column) => column.name ?? '') : [];
-      const columnTypes = result.columnMetadata ? result.columnMetadata?.map((column) => covertFieldToPrismaColumnType(column.typeName)) : [];
-      const rows = result.records?.map(recordsArray => recordsArray.map(record => record.stringValue)) ?? [];
-      return {
-        columnNames: columnNames,
-        columnTypes: columnTypes,
-        rows,
-      };
-    })
-  }
-
-  async executeRaw(query: Query): Promise<Result<number>> {
-    const tag = '[js::executeRaw]';
-    debug(`${tag} %O`, query);
-
-    return (await this.performIO(query)).map((r) => r.numberOfRecordsUpdated ?? 0);
+    return res;
   }
 
   /**
    * Run a query against the database, returning the result set.
    */
   private async performIO(query: Query): Promise<Result<ExecuteStatementResponse>> {
+    const tag = '[js::performIO]';
+    debug(`${tag} %O`);
+    debug(`${tag} Query before transformation %O`, query);
+
     const executeStatementCommandInput: ExecuteStatementCommandInput = {
       database: this.queryParams.databaseName,
       resourceArn: this.queryParams.resourceArn,
       secretArn: this.queryParams.secretArn,
-      sql: convertPositionalParametersToVariableParameters(query.sql),
-      parameters: convertPrismaValuesToRdsParameters(query.args),
+      sql: convertSql(query.sql),
+      parameters: convertParameters(query.args, query.argTypes),
       includeResultMetadata: true,
       transactionId: this.transactionId,
     };
 
     const rdsQueryToLog = omit(executeStatementCommandInput, 'database', 'resourceArn', 'secretArn');
-    const tag = '[js::performIO]';
 
     try {
       const executeStatementCommand = new ExecuteStatementCommand(executeStatementCommandInput);
-      debug(`${tag} %O`, rdsQueryToLog);
+      debug(`${tag} Query after transformation %O`, rdsQueryToLog);
       const result = await this.client.send(executeStatementCommand);
       debug(`${tag} Result %O`, result);
 
       return ok(result);
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       //TODO: Do better error handling
-      debug('Error in performIO: %O', JSON.stringify(e));
-      throw e;
+      debug('Error in performIO: %O', JSON.stringify(error));
+      return err({
+        ...error,
+        'kind': 'Postgres',
+        'message': 'message' in error ? error?.message : 'Unknown Error',
+      });
     }
   }
 }
