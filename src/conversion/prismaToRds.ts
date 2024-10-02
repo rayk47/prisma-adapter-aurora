@@ -25,7 +25,6 @@ export const convertSql = (sql: string) => {
  * @returns an rds compatible parameter list
  */
 export const convertParameters = (parameters: unknown[], parameterTypes: ArgType[]): SqlParameter[] => {
-    parameters = fixArrayBufferParameters(parameters);
     const rdsParameters: SqlParameter[] = (parameters).map((value: unknown, index) => {
         return {
             name: prefixedParameterVariableName + String(index + 1),
@@ -94,32 +93,4 @@ const getRdsField = (value: unknown | unknown[], argType: ArgType): Field => {
             debug(`[js::getRdsField] Unsupported Prisma Type ${argType}. Please raise a github issue asking for support of this type %O`, argType);
             throw new Error(`Unsupported ArgType: ${argType}`);
     }
-}
-
-/**
- * https://github.com/brianc/node-postgres/pull/2930
- * See https://github.com/rayk47/prisma-adapter-aurora/issues/2
- * @param values 
- * @returns 
- */
-function fixArrayBufferParameters(values: unknown[]) {
-    for (let i = 0; i < values.length; i++) {
-        const list = values[i];
-        if (!Array.isArray(list)) {
-            continue;
-        }
-
-        for (let j = 0; j < list.length; j++) {
-            const listItem = list[j];
-            if (ArrayBuffer.isView(listItem)) {
-                list[j] = Buffer.from(
-                    listItem.buffer,
-                    listItem.byteOffset,
-                    listItem.byteLength,
-                );
-            }
-        }
-    }
-
-    return values;
 }

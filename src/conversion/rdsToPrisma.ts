@@ -91,20 +91,24 @@ export const convertColumnType = (typeName: ColumnMetadata['typeName']): ColumnT
  * @returns a prisma compatible value
  */
 export const convertValue = (field: Field, columnType: ColumnType) => {
-    if (field.stringValue) {
+    if (field.isNull) {
+        return null;
+    }
+    else if (field.stringValue) {
         return field.stringValue;
     } else if (field.doubleValue) {
         return field.doubleValue;
     } else if (field.booleanValue) {
         return field.booleanValue;
     } else if (field.blobValue) {
+        if (columnType === ColumnTypeEnum.Bytes) {
+            return Buffer.from(field.blobValue).toString();
+        }
         return field.blobValue;
     } else if (field.longValue) {
         if (columnType === ColumnTypeEnum.Int64) {
             return BigInt(field.longValue).toString()
         } else { return field.longValue };
-    } else if (field.isNull) {
-        return null;
     } else if (field.arrayValue) {
         //TODO: Fix this https://github.com/rayk47/prisma-adapter-aurora/issues/10
         return field.arrayValue;

@@ -65,10 +65,7 @@ class AuroraQueryable<ClientT extends RDSDataClient> implements Queryable {
           rows,
         };
       });
-      debug(`[js::queryRaw] RDS Response Converted to Prisma %O`, JSON.stringify(
-        response,
-        (key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
-      ));
+      debug(`[js::queryRaw] RDS Response Converted to Prisma %O`, JSON.stringify(response));
 
       return response;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
